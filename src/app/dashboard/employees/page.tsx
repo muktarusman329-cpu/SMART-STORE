@@ -1,0 +1,139 @@
+import { DashboardHeader } from '@/components/dashboard-header';
+import { getEmployees } from '@/lib/actions/employees';
+import { Plus, Search, DollarSign, Users, Briefcase, Calendar, Edit, Trash2, Mail, Phone } from 'lucide-react';
+import { formatCurrency, formatDate } from '@/lib/utils';
+
+export default async function EmployeesPage() {
+  const employees = await getEmployees();
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 transition-colors duration-300">
+      <DashboardHeader title="Human Capital" userRole="admin" />
+      
+      <main className="p-8">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+          <div className="group bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Total Workforce</p>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white">{employees.length}</h3>
+                <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 mt-2">Active staff</p>
+              </div>
+              <div className="p-4 bg-blue-50 dark:bg-blue-500/10 rounded-2xl">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+            </div>
+          </div>
+          <div className="group bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Monthly Payroll</p>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white">
+                  {formatCurrency(employees.reduce((sum: number, e: any) => sum + (e.salary || 0), 0))}
+                </h3>
+                <p className="text-sm font-semibold text-rose-600 dark:text-rose-400 mt-2">Operating cost</p>
+              </div>
+              <div className="p-4 bg-rose-50 dark:bg-rose-500/10 rounded-2xl">
+                <DollarSign className="h-8 w-8 text-rose-600" />
+              </div>
+            </div>
+          </div>
+          <div className="group bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Top Performer</p>
+                <h3 className="text-xl font-black text-slate-900 dark:text-white truncate max-w-[150px]">
+                  {employees[0]?.name || 'N/A'}
+                </h3>
+                <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 mt-2">Highest sales</p>
+              </div>
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl">
+                <Briefcase className="h-8 w-8 text-emerald-600" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Actions Bar */}
+        <div className="flex flex-col xl:flex-row items-center justify-between gap-6 mb-10">
+          <div className="relative flex-1 xl:w-96 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+            <input
+              type="text"
+              placeholder="Search employees by name, role, or ID..."
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-4 focus:ring-blue-600/5 focus:border-blue-600 transition-all text-slate-900 dark:text-white font-semibold outline-none placeholder:text-slate-400"
+            />
+          </div>
+
+          <button className="w-full xl:w-auto flex items-center justify-center space-x-2 px-8 py-4 bg-blue-600 text-white rounded-2xl font-black shadow-lg shadow-blue-200 dark:shadow-none hover:bg-blue-700 hover:-translate-y-0.5 transition-all active:scale-95">
+            <Plus className="h-6 w-6" />
+            <span>ADD EMPLOYEE</span>
+          </button>
+        </div>
+
+        {/* Employees Table */}
+        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 dark:border-slate-800 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Employee Profile</th>
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Designation</th>
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Department</th>
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Performance</th>
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Joined</th>
+                  <th className="text-right py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {employees.map((employee: any) => (
+                  <tr key={employee._id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                    <td className="py-6 px-8">
+                      <div className="flex items-center space-x-4">
+                        <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-blue-600 font-black shadow-sm border border-slate-200 dark:border-slate-700">
+                          {employee.name.charAt(0)}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{employee.name}</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">{employee.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-6 px-8">
+                      <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-500/20">
+                        {employee.position}
+                      </span>
+                    </td>
+                    <td className="py-6 px-8">
+                      <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{employee.department}</p>
+                    </td>
+                    <td className="py-6 px-8">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(employee.totalSales || 0)}</span>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{employee.salesCount || 0} Transactions</p>
+                      </div>
+                    </td>
+                    <td className="py-6 px-8 text-xs font-bold text-slate-500 dark:text-slate-400">
+                      {formatDate(employee.createdAt)}
+                    </td>
+                    <td className="py-6 px-8 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button className="p-2 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl text-blue-600 transition-colors">
+                          <Edit className="h-5 w-5" />
+                        </button>
+                        <button className="p-2 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl text-rose-500 transition-colors">
+                          <Trash2 className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

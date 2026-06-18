@@ -1,0 +1,34 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createNotification, getNotifications } from '@/lib/actions/notifications';
+
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const filters = {
+      userId: searchParams.get('userId') || undefined,
+      isRead: searchParams.get('isRead') === 'true' ? true : searchParams.get('isRead') === 'false' ? false : undefined,
+      category: searchParams.get('category') || undefined,
+    };
+
+    const notifications = await getNotifications(filters);
+    return NextResponse.json({ success: true, data: notifications });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const data = await request.json();
+    const notification = await createNotification(data);
+    return NextResponse.json({ success: true, data: notification });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
+  }
+}
