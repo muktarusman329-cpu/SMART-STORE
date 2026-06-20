@@ -29,7 +29,7 @@ export function generateSKU(): string {
 
 export function generateBarcode(): string {
   const timestamp = Date.now().toString();
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  const random = Math.random().toString(36).substring(2, 10).toUpperCase();
   return `${timestamp}${random}`;
 }
 

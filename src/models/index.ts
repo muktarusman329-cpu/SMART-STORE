@@ -12,3 +12,4 @@ export { default as AIReport } from './AIReport';
 export { default as Order } from './Order';
 export { default as Transaction } from './Transaction';
 export { default as Loyalty } from './Loyalty';
+export { default as WhatsAppMessage } from './WhatsAppMessage';

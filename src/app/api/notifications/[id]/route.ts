@@ -3,10 +3,11 @@ import { deleteNotification, markAsRead } from '@/lib/actions/notifications';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
-    const notification = await markAsRead(params.id);
+    const notification = await markAsRead(id);
     return NextResponse.json({ success: true, data: notification });
   } catch (error: any) {
     return NextResponse.json(
@@ -18,10 +19,11 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
   try {
-    await deleteNotification(params.id);
+    await deleteNotification(id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json(

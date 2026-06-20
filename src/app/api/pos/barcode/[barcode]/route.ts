@@ -3,10 +3,11 @@ import { getProductByBarcode } from '@/lib/actions/pos';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { barcode: string } }
+  context: { params: Promise<{ barcode: string }> }
 ) {
+  const { barcode } = await context.params;
   try {
-    const product = await getProductByBarcode(params.barcode);
+    const product = await getProductByBarcode(barcode);
 
     if (!product) {
       return NextResponse.json(

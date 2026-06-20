@@ -1,3 +1,4 @@
+import '../src/lib/load-env';
 import { seedDatabase } from '../src/lib/seed';
 
 seedDatabase()

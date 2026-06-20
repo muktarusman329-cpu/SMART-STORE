@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { DashboardHeader } from '@/components/dashboard-header';
 import { Bell, Check, CheckCheck, Trash2, AlertTriangle, Info, AlertCircle, CheckCircle, Tag, Clock } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
+import { formatDate, cn } from '@/lib/utils';
 
 interface Notification {
   _id: string;

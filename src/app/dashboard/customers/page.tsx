@@ -1,6 +1,6 @@
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getCustomers } from '@/lib/actions/customers';
-import { Plus, Search, Mail, Phone, Award, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Mail, Phone, Award, Edit, Trash2, User } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -81,6 +81,7 @@ export default async function CustomersPage() {
                 <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
                   <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Customer Profile</th>
                   <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Contact / Info</th>
+                  <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Type</th>
                   <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Loyalty Status</th>
                   <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Lifetime Value</th>
                   <th className="text-left py-6 px-8 text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Last Seen</th>
@@ -112,6 +113,16 @@ export default async function CustomersPage() {
                       </div>
                     </td>
                     <td className="py-6 px-8">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                        customer.customerType === 'vip' ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' :
+                        customer.customerType === 'corporate' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400' :
+                        customer.customerType === 'registered' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' :
+                        'bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-400'
+                      }`}>
+                        {customer.customerType || 'walk-in'}
+                      </span>
+                    </td>
+                    <td className="py-6 px-8">
                       <div className="flex items-center space-x-2">
                         <Award className="h-4 w-4 text-orange-500" />
                         <span className="text-sm font-black text-slate-900 dark:text-white">{customer.loyaltyPoints}</span>
@@ -127,6 +138,12 @@ export default async function CustomersPage() {
                     </td>
                     <td className="py-6 px-8 text-right">
                       <div className="flex items-center justify-end space-x-2">
+                        <Link 
+                          href={`/dashboard/customers/${customer._id}`}
+                          className="inline-flex items-center space-x-1 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 rounded-xl text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors font-bold text-xs uppercase tracking-wider"
+                        >
+                          <span>View</span>
+                        </Link>
                         <button className="p-2 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-xl text-blue-600 transition-colors">
                           <Edit className="h-5 w-5" />
                         </button>

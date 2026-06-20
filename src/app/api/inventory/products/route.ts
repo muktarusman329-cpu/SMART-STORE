@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createProduct, getProducts } from '@/lib/actions/inventory';
+import { auth } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const filters = {
       category: searchParams.get('category') || undefined,
@@ -23,6 +32,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     const data = await request.json();
     const product = await createProduct(data);
     return NextResponse.json({ success: true, data: product });

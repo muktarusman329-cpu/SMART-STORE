@@ -6,6 +6,7 @@ export interface ICustomer extends Document {
   email?: string;
   phone: string;
   address?: string;
+  customerType: 'walk-in' | 'registered' | 'vip' | 'corporate';
   loyaltyPoints: number;
   totalSpent: number;
   purchaseCount: number;
@@ -43,6 +44,11 @@ const CustomerSchema = new Schema<ICustomer>(
     address: {
       type: String,
       trim: true,
+    },
+    customerType: {
+      type: String,
+      enum: ['walk-in', 'registered', 'vip', 'corporate'],
+      default: 'walk-in',
     },
     loyaltyPoints: {
       type: Number,

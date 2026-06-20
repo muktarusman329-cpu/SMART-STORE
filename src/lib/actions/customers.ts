@@ -139,3 +139,16 @@ export async function getCustomerAnalytics() {
     loyaltyLevels: loyaltyLevelsData,
   };
 }
+
+export async function getCustomerPurchaseHistory(customerId: string) {
+  await connectDB();
+  
+  const { Sale } = await import('@/models');
+  
+  const sales = await Sale.find({ customerId })
+    .sort({ createdAt: -1 })
+    .populate('cashierId', 'name')
+    .populate('branchId', 'name');
+
+  return JSON.parse(JSON.stringify(sales));
+}

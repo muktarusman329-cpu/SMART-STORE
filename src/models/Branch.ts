@@ -13,6 +13,22 @@ export interface IBranch extends Document {
     taxRate: number;
     lowStockThreshold: number;
     expiryWarningDays: number;
+    // Notifications settings
+    emailNotifications?: boolean;
+    smsNotifications?: boolean;
+    lowStockAlerts?: boolean;
+    expiryAlerts?: boolean;
+    // Payment settings
+    paystackPublicKey?: string;
+    paystackSecretKey?: string;
+    enableCash?: boolean;
+    enableCard?: boolean;
+    enableTransfer?: boolean;
+    // Online store settings
+    storeName?: string;
+    storeEmail?: string;
+    deliveryCharge?: number;
+    whatsappNumber?: string;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -73,6 +89,62 @@ const BranchSchema = new Schema<IBranch>(
         type: Number,
         default: 15,
         min: [0, 'Expiry warning days cannot be negative'],
+      },
+      // Notifications settings
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      smsNotifications: {
+        type: Boolean,
+        default: false,
+      },
+      lowStockAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      expiryAlerts: {
+        type: Boolean,
+        default: true,
+      },
+      // Payment settings
+      paystackPublicKey: {
+        type: String,
+        default: '',
+      },
+      paystackSecretKey: {
+        type: String,
+        default: '',
+      },
+      enableCash: {
+        type: Boolean,
+        default: true,
+      },
+      enableCard: {
+        type: Boolean,
+        default: true,
+      },
+      enableTransfer: {
+        type: Boolean,
+        default: true,
+      },
+      // Online store settings
+      storeName: {
+        type: String,
+        default: 'SmartMart Pro',
+      },
+      storeEmail: {
+        type: String,
+        default: 'contact@smartmart.com',
+      },
+      deliveryCharge: {
+        type: Number,
+        default: 0,
+        min: [0, 'Delivery charge cannot be negative'],
+      },
+      whatsappNumber: {
+        type: String,
+        default: '',
       },
     },
   },

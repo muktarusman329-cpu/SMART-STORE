@@ -4,6 +4,7 @@ import connectDB from '@/lib/mongodb';
 import { Sale, Product, Customer, Transaction, Loyalty } from '@/models';
 import { generateCustomerId, generateTransactionId } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
+import { sendWhatsAppMessage, generateThankYouMessage } from '@/lib/whatsapp';
 
 export async function searchProducts(query: string) {
   await connectDB();
@@ -43,6 +44,7 @@ export async function createSale(data: {
   customerName?: string;
   customerEmail?: string;
   customerAddress?: string;
+  customerType?: 'walk-in' | 'registered' | 'vip' | 'corporate';
   customerId?: string;
   items: Array<{
     productId: string;
@@ -136,6 +138,7 @@ export async function createSale(data: {
   // Handle customer - automatic creation or update
   let customerId = data.customerId;
   let customerName = data.customerName || 'Walk-in Customer';
+  let customerPhone = data.customerPhone;
   
   if (data.customerPhone) {
     // Check if customer exists by phone
@@ -143,12 +146,14 @@ export async function createSale(data: {
     
     if (customer) {
       // Update existing customer
-      customerId = customer._id;
+      customerId = customer._id.toString();
       customerName = customer.name || customerName;
+      customerPhone = customer.phone;
       
       if (data.customerName) customer.name = data.customerName;
       if (data.customerEmail) customer.email = data.customerEmail;
       if (data.customerAddress) customer.address = data.customerAddress;
+      if (data.customerType) customer.customerType = data.customerType;
       
       customer.totalSpent += total;
       customer.purchaseCount += 1;
@@ -193,6 +198,7 @@ export async function createSale(data: {
         name: data.customerName || 'Walk-in Customer',
         email: data.customerEmail,
         address: data.customerAddress,
+        customerType: data.customerType || 'walk-in',
         loyaltyPoints: Math.floor(total / 10),
         totalSpent: total,
         purchaseCount: 1,
@@ -201,8 +207,9 @@ export async function createSale(data: {
         favoriteCategories: [],
       });
       
-      customerId = newCustomer._id;
-      customerName = newCustomer.name;
+      customerId = newCustomer._id.toString();
+      customerName = newCustomer.name ?? customerName;
+      customerPhone = newCustomer.phone;
       
       // Create loyalty record
       await Loyalty.create({
@@ -242,6 +249,31 @@ export async function createSale(data: {
     branchId: data.branchId,
     cashierId: data.cashierId,
   });
+
+  // Send WhatsApp thank you message if customer phone is available
+  if (customerPhone && customerName) {
+    console.log('📱 Customer has phone number, attempting to send WhatsApp message...');
+    try {
+      const message = generateThankYouMessage(customerName, total);
+      console.log('📝 Generated thank you message:', message.substring(0, 50) + '...');
+      
+      const whatsappResult = await sendWhatsAppMessage({
+        customerId,
+        customerName,
+        customerPhone,
+        message,
+        saleId: sale._id.toString(),
+        amount: total,
+      });
+      
+      console.log('📱 WhatsApp sending result:', whatsappResult);
+    } catch (error) {
+      // Log error but don't fail the sale if WhatsApp fails
+      console.error('❌ Failed to send WhatsApp message:', error);
+    }
+  } else {
+    console.log('⚠️ No customer phone number provided, skipping WhatsApp message');
+  }
 
   revalidatePath('/dashboard/pos');
   revalidatePath('/dashboard');

@@ -164,7 +164,7 @@ export default function SalesAnalyticsPage() {
                     contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 50px rgba(0,0,0,0.1)', backgroundColor: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)' }}
                     itemStyle={{ fontWeight: 900, fontSize: '12px' }}
                     labelStyle={{ fontWeight: 900, marginBottom: '4px', fontSize: '10px', color: '#64748b', textTransform: 'uppercase' }}
-                    formatter={(value: number) => [formatCurrency(value), 'Revenue']}
+                    formatter={(value) => [formatCurrency(Number(value)), 'Revenue']}
                   />
                   <Line type="monotone" dataKey="revenue" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8, strokeWidth: 0 }} />
                 </LineChart>

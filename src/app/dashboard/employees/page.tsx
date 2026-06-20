@@ -92,11 +92,11 @@ export default async function EmployeesPage() {
                     <td className="py-6 px-8">
                       <div className="flex items-center space-x-4">
                         <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-blue-600 font-black shadow-sm border border-slate-200 dark:border-slate-700">
-                          {employee.name.charAt(0)}
+                          {(employee.name ?? 'E').charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{employee.name}</p>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">{employee.email}</p>
+                          <p className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{employee.name ?? '—'}</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-0.5">{employee.email ?? '—'}</p>
                         </div>
                       </div>
                     </td>
