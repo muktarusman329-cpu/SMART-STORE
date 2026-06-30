@@ -124,11 +124,14 @@ src/
 
 ## Deployment
 
-### Vercel
+### Railway (Recommended)
 1. Push code to GitHub
-2. Import project to Vercel
-3. Add environment variables
-4. Deploy
+2. Create a new project on [Railway](https://railway.app)
+3. Deploy from GitHub repo
+4. Add environment variables in Railway dashboard
+5. Generate a domain under Settings → Networking
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
 ### MongoDB Atlas
 1. Create a free cluster
