@@ -1,9 +1,13 @@
 import mongoose, { Schema, Model, Document } from 'mongoose';
 
+export type BarcodeType = 'GLOBAL' | 'INTERNAL';
+
 export interface IProduct extends Document {
   name: string;
   sku: string;
   barcode: string;
+  barcodeType: BarcodeType;
+  brand?: string;
   description?: string;
   categoryId: mongoose.Types.ObjectId;
   branchId?: mongoose.Types.ObjectId;
@@ -37,6 +41,16 @@ const ProductSchema = new Schema<IProduct>(
       type: String,
       required: [true, 'Barcode is required'],
       unique: true,
+      trim: true,
+    },
+    barcodeType: {
+      type: String,
+      enum: ['GLOBAL', 'INTERNAL'],
+      default: 'INTERNAL',
+      required: [true, 'Barcode type is required'],
+    },
+    brand: {
+      type: String,
       trim: true,
     },
     description: {

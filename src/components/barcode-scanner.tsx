@@ -21,15 +21,49 @@ export default function BarcodeScanner({
   const [activeCameraId, setActiveCameraId] = useState<string | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const qrCodeRef = useRef<any>(null);
+  const scannerElementRef = useRef<HTMLDivElement>(null);
   const elementId = 'scanner-video-feed';
 
   useEffect(() => {
+    setIsMounted(true);
+    return () => setIsMounted(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || !scannerElementRef.current) return;
+
+    // Ensure the DOM element is fully rendered before marking as ready
+    const checkElementReady = () => {
+      if (scannerElementRef.current && scannerElementRef.current.clientWidth > 0) {
+        setIsReady(true);
+      } else {
+        // Retry after a short delay if element isn't ready
+        setTimeout(checkElementReady, 100);
+      }
+    };
+
+    checkElementReady();
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (!isReady) return;
+
     let html5Qrcode: any;
 
     // Load html5-qrcode dynamically to support SSR environments
     import('html5-qrcode')
       .then((module) => {
+        // Double-check that the element exists and has dimensions
+        const element = document.getElementById(elementId);
+        if (!element || element.clientWidth === 0) {
+          console.error('Scanner element not ready or has no dimensions');
+          setPermissionError('Scanner element not ready. Please refresh the page.');
+          return;
+        }
+
         html5Qrcode = new module.Html5Qrcode(elementId);
         qrCodeRef.current = html5Qrcode;
 
@@ -46,7 +80,11 @@ export default function BarcodeScanner({
               );
               const defaultCameraId = backCamera ? backCamera.id : devices[0].id;
               setActiveCameraId(defaultCameraId);
-              startScanner(html5Qrcode, defaultCameraId);
+              
+              // Use setTimeout to ensure the DOM is fully ready
+              setTimeout(() => {
+                startScanner(html5Qrcode, defaultCameraId);
+              }, 100);
             } else {
               setPermissionError('No camera devices detected.');
             }
@@ -70,7 +108,7 @@ export default function BarcodeScanner({
           .catch((err: any) => console.error('Error stopping scanner on unmount:', err));
       }
     };
-  }, []);
+  }, [isReady]);
 
   const startScanner = (scanner: any, cameraId: string) => {
     if (!scanner) return;
@@ -155,7 +193,11 @@ export default function BarcodeScanner({
 
       {/* Video Scanning Element Container */}
       <div className="relative flex-1 w-full bg-slate-950 flex items-center justify-center min-h-[280px]">
-        <div id={elementId} className="w-full h-full object-cover"></div>
+        <div 
+          ref={scannerElementRef}
+          id={elementId} 
+          className="w-full h-full object-cover"
+        ></div>
 
         {/* Overlay Scanner Aim Box (custom UI layer) */}
         {isScanning && !permissionError && (

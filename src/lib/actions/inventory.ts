@@ -71,11 +71,13 @@ export async function createProduct(data: any) {
 
   const sku = data.sku || generateSKU();
   const barcode = data.barcode || generateBarcode();
+  const barcodeType = data.barcodeType || 'INTERNAL';
 
   const product = await Product.create({
     ...data,
     sku,
     barcode,
+    barcodeType,
   });
 
   revalidatePath('/dashboard/inventory');
