@@ -7,10 +7,15 @@ import Link from 'next/link';
 interface Purchase {
   _id: string;
   saleNumber: string;
-  date: string;
+  date?: string;
+  createdAt?: string | Date;
   total: number;
   paymentMethod: string;
-  cashier: string;
+  cashier?: string;
+  cashierId?: {
+    name?: string;
+  };
+  items?: any[];
 }
 
 export default async function CustomerDetailPage({ params }: { params: { id: string } }) {
@@ -181,14 +186,14 @@ export default async function CustomerDetailPage({ params }: { params: { id: str
                       </td>
                       <td className="py-6 px-8">
                         <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                          {new Date(sale.createdAt).toLocaleDateString()}
+                          {new Date(sale.createdAt || sale.date || '').toLocaleDateString()}
                         </p>
                         <p className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                          {new Date(sale.createdAt).toLocaleTimeString()}
+                          {new Date(sale.createdAt || sale.date || '').toLocaleTimeString()}
                         </p>
                       </td>
                       <td className="py-6 px-8">
-                        <p className="text-sm font-bold text-slate-900 dark:text-white">{sale.items.length} items</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">{sale.items?.length || 0} items</p>
                       </td>
                       <td className="py-6 px-8">
                         <p className="text-sm font-black text-slate-900 dark:text-white">{formatCurrency(sale.total)}</p>
