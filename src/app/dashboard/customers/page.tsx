@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getCustomers } from '@/lib/actions/customers';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Award, Phone, Mail } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -14,8 +14,11 @@ interface Customer {
   phone: string;
   totalSpent: number;
   loyaltyPoints: number;
+  purchaseCount: number;
+  customerType?: string;
   visits: number;
   lastVisit: string;
+  updatedAt: string;
 }
 
 export default function CustomersPage() {
