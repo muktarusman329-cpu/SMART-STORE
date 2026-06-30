@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getOrders } from '@/lib/actions/orders';
-import { MessageSquare, Clock, CheckCircle2, ShoppingBag, MoreVertical, Search, Filter, X } from 'lucide-react';
+import { MessageSquare, Clock, CheckCircle2, ShoppingBag, MoreVertical, Search, Filter, X, AlertTriangle } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -11,6 +11,7 @@ export default function WhatsAppOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -35,6 +36,7 @@ export default function WhatsAppOrdersPage() {
       setOrders(data);
     } catch (error) {
       console.error('Error loading orders:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load WhatsApp orders');
     } finally {
       setLoading(false);
     }
@@ -57,6 +59,13 @@ export default function WhatsAppOrdersPage() {
       <DashboardHeader title="Social Commerce" userRole="manager" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); loadOrders(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
         <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-[2rem] p-8 mb-10 flex items-center space-x-6 shadow-sm">
           <div className="h-16 w-16 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200 dark:shadow-none">
             <MessageSquare className="h-8 w-8" />

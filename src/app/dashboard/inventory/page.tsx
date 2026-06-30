@@ -14,6 +14,7 @@ export default function InventoryPage() {
   const [expiringProducts, setExpiringProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -34,6 +35,7 @@ export default function InventoryPage() {
       setExpiringProducts(expiringData);
     } catch (error) {
       console.error('Error loading inventory data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load inventory data');
     } finally {
       setLoading(false);
     }
@@ -142,6 +144,13 @@ export default function InventoryPage() {
             <div className="p-12 text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
               <p className="mt-4 text-sm font-semibold text-muted-foreground">Loading inventory...</p>
+            </div>
+          ) : error ? (
+            <div className="p-12 text-center">
+              <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <p className="text-lg font-bold text-foreground mb-2">Failed to load inventory</p>
+              <p className="text-sm text-muted-foreground mb-4">{error}</p>
+              <button onClick={() => { setError(null); loadData(); }} className="px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:bg-primary/90 transition-colors">Retry</button>
             </div>
           ) : products.length === 0 ? (
             <div className="p-12 text-center">

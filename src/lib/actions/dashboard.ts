@@ -5,25 +5,7 @@ import { Sale, Product, Expense, Customer, Notification } from '@/models';
 import { startOfDay, endOfDay, startOfMonth, endOfMonth, subDays } from 'date-fns';
 
 export async function getDashboardStats() {
-  const db = await connectDB();
-  
-  if (!db) {
-    // Return default data when MongoDB is not connected
-    return {
-      todayRevenue: 0,
-      todaySalesCount: 0,
-      monthlyRevenue: 0,
-      revenueChange: 0,
-      totalProducts: 0,
-      lowStockProducts: 0,
-      expiringProducts: 0,
-      totalExpenses: 0,
-      totalProfit: 0,
-      totalCustomers: 0,
-      recentTransactions: [],
-      unreadNotifications: 0,
-    };
-  }
+  await connectDB();
 
   const today = new Date();
   const todayStart = startOfDay(today);
@@ -117,12 +99,7 @@ export async function getDashboardStats() {
 }
 
 export async function getSalesData(period: 'daily' | 'weekly' | 'monthly' | 'yearly') {
-  const db = await connectDB();
-  
-  if (!db) {
-    // Return empty data when MongoDB is not connected
-    return [];
-  }
+  await connectDB();
 
   const today = new Date();
   let startDate: Date;

@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getCustomers } from '@/lib/actions/customers';
-import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -22,6 +22,7 @@ export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadCustomers = async (search?: string) => {
     try {
@@ -30,6 +31,7 @@ export default function CustomersPage() {
       setCustomers(data);
     } catch (error) {
       console.error('Error loading customers:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load customers');
     } finally {
       setLoading(false);
     }
@@ -118,6 +120,14 @@ export default function CustomersPage() {
             <span>ADD CUSTOMER</span>
           </Link>
         </div>
+
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); loadCustomers(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
 
         {/* Customers Table */}
         <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 dark:border-slate-800 overflow-hidden">

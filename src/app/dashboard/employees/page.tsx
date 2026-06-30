@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getEmployees } from '@/lib/actions/employees';
-import { Plus, Search, DollarSign, Users, Briefcase, Calendar, Edit, Trash2, Mail, Phone, X } from 'lucide-react';
+import { Plus, Search, DollarSign, Users, Briefcase, Calendar, Edit, Trash2, Mail, Phone, X, AlertTriangle } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
@@ -10,6 +10,7 @@ export default function EmployeesPage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadEmployees();
@@ -22,6 +23,7 @@ export default function EmployeesPage() {
       setEmployees(data);
     } catch (error) {
       console.error('Error loading employees:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load employees');
     } finally {
       setLoading(false);
     }
@@ -44,6 +46,13 @@ export default function EmployeesPage() {
       <DashboardHeader title="Human Capital" userRole="admin" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); loadEmployees(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
           <div className="group bg-white dark:bg-slate-900 rounded-[2rem] p-8 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">

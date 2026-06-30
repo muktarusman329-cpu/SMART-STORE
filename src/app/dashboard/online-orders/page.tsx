@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getOrders } from '@/lib/actions/orders';
-import { ShoppingBag, Truck, CheckCircle2, Clock, XCircle, MoreVertical, Search, Filter, X } from 'lucide-react';
+import { ShoppingBag, Truck, CheckCircle2, Clock, XCircle, MoreVertical, Search, Filter, X, AlertTriangle } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
@@ -11,6 +11,7 @@ export default function OnlineOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getStatusStyles = (status: string) => {
     switch (status) {
@@ -35,6 +36,7 @@ export default function OnlineOrdersPage() {
       setOrders(data);
     } catch (error) {
       console.error('Error loading orders:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load orders');
     } finally {
       setLoading(false);
     }
@@ -57,6 +59,13 @@ export default function OnlineOrdersPage() {
       <DashboardHeader title="Digital Fulfilment" userRole="manager" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); loadOrders(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10 text-white">
           <div className="group bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">
             <div className="flex items-center justify-between">

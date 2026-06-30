@@ -18,7 +18,7 @@ import {
   ResponsiveContainer 
 } from 'recharts';
 import { formatCurrency } from '@/lib/utils';
-import { Calendar, TrendingUp, DollarSign, ShoppingCart, BarChart3, Activity } from 'lucide-react';
+import { Calendar, TrendingUp, DollarSign, ShoppingCart, BarChart3, Activity, AlertTriangle } from 'lucide-react';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
@@ -36,6 +36,7 @@ export default function SalesAnalyticsPage() {
     avgChange: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSalesData();
@@ -52,6 +53,7 @@ export default function SalesAnalyticsPage() {
       }
     } catch (error) {
       console.error('Error fetching sales data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load sales data');
     } finally {
       setLoading(false);
     }
@@ -62,6 +64,13 @@ export default function SalesAnalyticsPage() {
       <DashboardHeader title="Advanced Analytics" userRole="admin" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); fetchSalesData(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
         {/* Period Selector */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10">
           <div>

@@ -12,6 +12,7 @@ export default function CategoriesPage() {
   const [loading, setLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCategories();
@@ -34,6 +35,7 @@ export default function CategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Error creating category:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create category');
     } finally {
       setLoading(false);
     }
@@ -47,6 +49,7 @@ export default function CategoriesPage() {
       fetchCategories();
     } catch (error) {
       console.error('Error deleting category:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete category');
     }
   };
 
@@ -56,6 +59,12 @@ export default function CategoriesPage() {
       
       <main className="p-8">
         <div className="max-w-6xl mx-auto">
+          {error && (
+            <div className="flex items-center space-x-3 p-4 mb-6 bg-destructive/10 border border-destructive/20 rounded-2xl">
+              <X className="h-5 w-5 text-destructive flex-shrink-0 cursor-pointer" onClick={() => setError(null)} />
+              <p className="text-sm font-semibold text-destructive">{error}</p>
+            </div>
+          )}
           {/* Header */}
           <div className="flex items-center justify-between mb-10">
             <div>

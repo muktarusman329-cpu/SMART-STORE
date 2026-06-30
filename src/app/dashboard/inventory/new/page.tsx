@@ -10,6 +10,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
@@ -46,6 +47,7 @@ export default function NewProductPage() {
       router.push('/dashboard/inventory');
     } catch (error) {
       console.error('Error creating product:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create product. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -59,6 +61,12 @@ export default function NewProductPage() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-card rounded-[2.5rem] shadow-lg border border-border p-10">
             <form onSubmit={handleSubmit} className="space-y-10">
+              {error && (
+                <div className="flex items-center space-x-3 p-4 bg-destructive/10 border border-destructive/20 rounded-2xl">
+                  <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
+                  <p className="text-sm font-semibold text-destructive">{error}</p>
+                </div>
+              )}
               {/* Basic Information */}
               <div>
                 <div className="flex items-center space-x-3 mb-6">
