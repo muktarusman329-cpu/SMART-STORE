@@ -20,15 +20,19 @@ interface LoyaltyLevel {
 interface Analytics {
   totalCustomers: number;
   totalRevenue: number;
-  averagePurchaseValue: number;
-  customerRetentionRate: number;
+  averageSpend: number;
+  totalPoints: number;
   topSpenders: Customer[];
   frequentCustomers: Customer[];
+  newCustomers: number;
+  returningCustomers: number;
+  returningRate: string;
+  recentPurchases: number;
   loyaltyLevels: LoyaltyLevel[];
 }
 
 export default async function CustomerAnalyticsPage() {
-  const analytics = await getCustomerAnalytics() as Analytics;
+  const analytics = await getCustomerAnalytics() as unknown as Analytics;
 
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">

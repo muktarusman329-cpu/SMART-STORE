@@ -60,61 +60,23 @@ export async function seedDatabase() {
   });
   console.log('✅ Created branch');
 
-  // Create Users
-  console.log('👥 Creating users...');
+  // Create single admin user
+  console.log('👤 Creating admin user...');
+  const adminEmail = process.env.ADMIN_EMAIL || 'admin@smartmart.com';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
   const adminUser = await User.create({
-    name: 'Admin User',
-    email: 'admin@smartmart.com',
-    password: 'admin123',
+    name: 'Admin',
+    email: adminEmail,
+    password: adminPassword,
     role: 'admin',
-    phone: '+1 234 567 8901',
+    phone: '',
     branchId: branch._id,
     isActive: true,
   });
-
-  const managerUser = await User.create({
-    name: 'Manager User',
-    email: 'manager@smartmart.com',
-    password: 'manager123',
-    role: 'manager',
-    phone: '+1 234 567 8902',
-    branchId: branch._id,
-    isActive: true,
-  });
-
-  const cashiers = await User.create([
-    {
-      name: 'Cashier Sarah',
-      email: 'sarah@smartmart.com',
-      password: 'cashier123',
-      role: 'cashier',
-      phone: '+1 234 567 8903',
-      branchId: branch._id,
-      isActive: true,
-    },
-    {
-      name: 'Cashier Mike',
-      email: 'mike@smartmart.com',
-      password: 'cashier123',
-      role: 'cashier',
-      phone: '+1 234 567 8904',
-      branchId: branch._id,
-      isActive: true,
-    },
-    {
-      name: 'Cashier Emma',
-      email: 'emma@smartmart.com',
-      password: 'cashier123',
-      role: 'cashier',
-      phone: '+1 234 567 8905',
-      branchId: branch._id,
-      isActive: true,
-    },
-  ]);
 
   // Update branch manager
   await Branch.findByIdAndUpdate(branch._id, { managerId: adminUser._id });
-  console.log('✅ Created 5 users (1 admin, 1 manager, 3 cashiers)');
+  console.log(`✅ Created admin user: ${adminEmail}`);
 
   // Create Categories
   console.log('📦 Creating categories...');
@@ -393,7 +355,7 @@ export async function seedDatabase() {
     const cashReceived = paymentMethod === 'cash' ? total + randomInt(0, 50) : total;
     const change = paymentMethod === 'cash' ? cashReceived - total : 0;
     const saleDate = randomDate(startDate, endDate);
-    const cashier = randomPick([adminUser, managerUser, ...cashiers]);
+    const cashier = adminUser;
     const customer = Math.random() > 0.3 ? randomPick(customers) : undefined;
 
     salesData.push({
@@ -479,75 +441,12 @@ export async function seedDatabase() {
   console.log('👔 Creating employees...');
   const employees = await Employee.create([
     {
-      userId: managerUser._id,
+      userId: adminUser._id,
       employeeId: 'EMP-001',
-      position: 'Store Manager',
+      position: 'Store Admin',
       department: 'Management',
       salary: 5000,
       hireDate: new Date('2023-01-01'),
-      branchId: branch._id,
-      isActive: true,
-      performance: {
-        totalSales: 150000,
-        totalTransactions: 1500,
-        averageTransactionValue: 100,
-        lastMonthSales: 15000,
-      },
-      attendance: {
-        present: 100,
-        absent: 5,
-        late: 3,
-      },
-    },
-    {
-      userId: cashiers[0]._id,
-      employeeId: 'EMP-002',
-      position: 'Cashier',
-      department: 'Sales',
-      salary: 2500,
-      hireDate: new Date('2023-06-01'),
-      branchId: branch._id,
-      isActive: true,
-      performance: {
-        totalSales: 80000,
-        totalTransactions: 1200,
-        averageTransactionValue: 67,
-        lastMonthSales: 8000,
-      },
-      attendance: {
-        present: 80,
-        absent: 8,
-        late: 5,
-      },
-    },
-    {
-      userId: cashiers[1]._id,
-      employeeId: 'EMP-003',
-      position: 'Cashier',
-      department: 'Sales',
-      salary: 2500,
-      hireDate: new Date('2023-07-15'),
-      branchId: branch._id,
-      isActive: true,
-      performance: {
-        totalSales: 75000,
-        totalTransactions: 1100,
-        averageTransactionValue: 68,
-        lastMonthSales: 7500,
-      },
-      attendance: {
-        present: 75,
-        absent: 10,
-        late: 6,
-      },
-    },
-    {
-      userId: cashiers[2]._id,
-      employeeId: 'EMP-004',
-      position: 'Cashier',
-      department: 'Sales',
-      salary: 2500,
-      hireDate: new Date('2023-08-01'),
       branchId: branch._id,
       isActive: true,
       performance: {

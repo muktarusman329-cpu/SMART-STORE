@@ -65,11 +65,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate role
-    const validRoles = ['admin', 'manager', 'cashier'];
+    // Validate role - admin cannot create other admins via this route
+    const validRoles = ['manager', 'cashier'];
     if (!validRoles.includes(role)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid role' },
+        { success: false, error: 'Invalid role. Only manager and cashier roles can be created.' },
         { status: 400 }
       );
     }
