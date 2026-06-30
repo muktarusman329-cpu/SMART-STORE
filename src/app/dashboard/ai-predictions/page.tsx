@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { DashboardHeader } from '@/components/dashboard-header';
-import { TrendingUp, BarChart3, Calendar, Target } from 'lucide-react';
+import { TrendingUp, BarChart3, Calendar, Target, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 
 interface Prediction {
@@ -16,6 +16,7 @@ export default function AIPredictionsPage() {
   const [days, setDays] = useState(30);
   const [prediction, setPrediction] = useState<Prediction | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handlePredict = async () => {
     if (!productId) return;
@@ -34,6 +35,7 @@ export default function AIPredictionsPage() {
       }
     } catch (error) {
       console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'Prediction failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -45,6 +47,13 @@ export default function AIPredictionsPage() {
       
       <main className="p-8">
         <div className="max-w-4xl mx-auto">
+          {error && (
+            <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+              <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+              <p className="text-sm font-semibold text-red-600">{error}</p>
+              <button onClick={() => setError(null)} className="ml-auto text-xs font-bold text-red-600 underline">Dismiss</button>
+            </div>
+          )}
           {/* Prediction Form */}
           <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 dark:border-slate-800 p-10 mb-10">
             <div className="flex items-center space-x-3 mb-8">

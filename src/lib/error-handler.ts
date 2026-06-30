@@ -55,8 +55,11 @@ export function handleApiError(error: Error | AppError | unknown): {
 export function asyncHandler(fn: Function) {
   return (req: unknown, res: unknown, next: unknown) => {
     Promise.resolve(fn(req, res, next)).catch((error: unknown) => {
+      console.error('Unhandled async error:', error);
       if (typeof next === 'function') {
         next(error);
+      } else {
+        throw error;
       }
     });
   };

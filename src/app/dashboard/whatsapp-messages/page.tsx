@@ -2,7 +2,7 @@
 
 import { DashboardHeader } from '@/components/dashboard-header';
 import { getWhatsAppMessages, getWhatsAppMessageStats } from '@/lib/whatsapp';
-import { MessageSquare, CheckCircle, XCircle, Clock, Search, Filter, Download, X } from 'lucide-react';
+import { MessageSquare, CheckCircle, XCircle, Clock, Search, Filter, Download, X, AlertTriangle } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
@@ -11,6 +11,7 @@ export default function WhatsAppMessagesPage() {
   const [stats, setStats] = useState<any>({ total: 0, sent: 0, failed: 0, successRate: 0 });
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -27,6 +28,7 @@ export default function WhatsAppMessagesPage() {
       setStats(statsData);
     } catch (error) {
       console.error('Error loading WhatsApp messages:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load WhatsApp messages');
     } finally {
       setLoading(false);
     }
@@ -49,6 +51,13 @@ export default function WhatsAppMessagesPage() {
       <DashboardHeader title="WhatsApp Messages" userRole="manager" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => { setError(null); loadData(); }} className="ml-auto text-xs font-bold text-red-600 underline">Retry</button>
+          </div>
+        )}
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
           <div className="group bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-xl transition-all duration-500">

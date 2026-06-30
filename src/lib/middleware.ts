@@ -14,9 +14,11 @@ export async function withAuth(request: NextRequest, handler: (request: NextRequ
 
     return await handler(request, session);
   } catch (error) {
+    console.error('withAuth error:', error);
+    const message = error instanceof Error ? error.message : 'Authentication failed';
     return NextResponse.json(
-      { success: false, error: 'Authentication failed' },
-      { status: 401 }
+      { success: false, error: message },
+      { status: 500 }
     );
   }
 }
@@ -41,9 +43,11 @@ export async function withRoleAuth(request: NextRequest, allowedRoles: string[],
 
     return await handler(request, session);
   } catch (error) {
+    console.error('withRoleAuth error:', error);
+    const message = error instanceof Error ? error.message : 'Authorization failed';
     return NextResponse.json(
-      { success: false, error: 'Authorization failed' },
-      { status: 403 }
+      { success: false, error: message },
+      { status: 500 }
     );
   }
 }

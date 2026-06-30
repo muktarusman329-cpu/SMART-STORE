@@ -19,6 +19,7 @@ interface Notification {
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchNotifications();
@@ -33,6 +34,7 @@ export default function NotificationsPage() {
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load notifications');
     } finally {
       setLoading(false);
     }
@@ -46,6 +48,7 @@ export default function NotificationsPage() {
       ));
     } catch (error) {
       console.error('Error marking as read:', error);
+      setError(error instanceof Error ? error.message : 'Failed to mark notification as read');
     }
   };
 
@@ -55,6 +58,7 @@ export default function NotificationsPage() {
       setNotifications(notifications.map(n => ({ ...n, isRead: true })));
     } catch (error) {
       console.error('Error marking all as read:', error);
+      setError(error instanceof Error ? error.message : 'Failed to mark all as read');
     }
   };
 
@@ -64,6 +68,7 @@ export default function NotificationsPage() {
       setNotifications(notifications.filter(n => n._id !== id));
     } catch (error) {
       console.error('Error deleting notification:', error);
+      setError(error instanceof Error ? error.message : 'Failed to delete notification');
     }
   };
 
@@ -98,6 +103,13 @@ export default function NotificationsPage() {
       <DashboardHeader title="Notifications" userRole="admin" />
       
       <main className="p-8">
+        {error && (
+          <div className="flex items-center space-x-3 p-4 mb-6 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl">
+            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+            <button onClick={() => setError(null)} className="ml-auto text-xs font-bold text-red-600 underline">Dismiss</button>
+          </div>
+        )}
         {/* Actions Bar */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-6">

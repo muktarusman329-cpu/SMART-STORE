@@ -132,7 +132,9 @@ export default function POSPage() {
         setCustomer(null);
         setCustomerType('walk-in');
       }
-    } catch { /* silent */ }
+    } catch (error) {
+      console.error('Customer lookup error:', error);
+    }
   };
 
   useEffect(() => {
@@ -155,6 +157,7 @@ export default function POSPage() {
       }
     } catch (error) {
       console.error('Search error:', error);
+      showToast('error', 'Product search failed. Please try again.');
     }
   };
 
