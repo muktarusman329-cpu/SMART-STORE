@@ -140,11 +140,12 @@ npx tsx scripts/verify-env.ts
 
 ### 4. Deployment Options
 
-#### Option A: Vercel (Recommended)
+#### Option A: Railway (Recommended)
 1. Push code to GitHub
-2. Import project in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
+2. Create a new project on [Railway](https://railway.app)
+3. Deploy from GitHub repo
+4. Add environment variables in Railway dashboard
+5. Generate a domain under Settings → Networking
 
 #### Option B: Self-Hosted
 1. Build the application: `npm run build`
