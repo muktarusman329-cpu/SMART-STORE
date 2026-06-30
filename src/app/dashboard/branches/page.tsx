@@ -5,10 +5,17 @@ import { Plus, MapPin, Phone, Mail, Settings, Edit, Trash2, Globe } from 'lucide
 interface Branch {
   _id: string;
   name: string;
+  code?: string;
   location: string;
+  address?: string;
   phone: string;
-  email: string;
+  email?: string;
   status: string;
+  isActive?: boolean;
+  settings?: {
+    taxRate?: number;
+    currency?: string;
+  };
 }
 
 export default async function BranchesPage() {
