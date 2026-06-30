@@ -123,11 +123,8 @@ export default function LoginPage() {
 
           {/* Register link */}
           <div className="mt-10 text-center">
-            <p className="text-sm font-bold text-muted-foreground">
-              New to the system?{' '}
-              <a href="/register" className="text-primary hover:underline">
-                Create Account
-              </a>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
+              Contact your administrator for account access
             </p>
           </div>
         </div>

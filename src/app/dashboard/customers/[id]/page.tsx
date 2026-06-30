@@ -8,9 +8,12 @@ interface Purchase {
   _id: string;
   saleNumber: string;
   date: string;
+  createdAt: string;
   total: number;
+  items: { productId: string; quantity: number; price: number }[];
   paymentMethod: string;
   cashier: string;
+  cashierId?: { name: string };
 }
 
 export default async function CustomerDetailPage({ params }: { params: { id: string } }) {

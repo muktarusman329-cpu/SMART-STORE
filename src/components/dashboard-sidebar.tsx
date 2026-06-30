@@ -19,7 +19,8 @@ import {
   Menu,
   X,
   ChevronRight,
-  Layers
+  Layers,
+  Shield
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
@@ -51,6 +52,7 @@ export function DashboardSidebar({ userRole, userName }: DashboardSidebarProps) 
     { name: 'Social Commerce', href: '/dashboard/whatsapp-orders', icon: MessageSquare, roles: ['admin', 'manager'] },
     { name: 'WhatsApp Messages', href: '/dashboard/whatsapp-messages', icon: MessageSquare, roles: ['admin', 'manager'] },
     { name: 'Supply Chain', href: '/dashboard/suppliers', icon: Truck, roles: ['admin', 'manager'] },
+    { name: 'User Management', href: '/dashboard/users', icon: Shield, roles: ['admin'] },
     { name: 'Human Capital', href: '/dashboard/employees', icon: Users, roles: ['admin'] },
     { name: 'Customer Base', href: '/dashboard/customers', icon: Users, roles: ['admin', 'manager'] },
     { name: 'Expenditure', href: '/dashboard/expenses', icon: Wallet, roles: ['admin', 'manager'] },
