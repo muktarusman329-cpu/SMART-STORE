@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { deleteNotification, markAsRead } from '@/lib/actions/notifications';
+import { apiSuccess, apiError } from '@/lib/api-utils';
 
 export async function PUT(
   request: NextRequest,
@@ -8,12 +9,9 @@ export async function PUT(
   const { id } = await context.params;
   try {
     const notification = await markAsRead(id);
-    return NextResponse.json({ success: true, data: notification });
+    return apiSuccess(notification);
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }
 
@@ -26,9 +24,6 @@ export async function DELETE(
     await deleteNotification(id);
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }

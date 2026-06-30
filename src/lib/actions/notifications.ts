@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Notification } from '@/models';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getNotifications(filters?: {
   userId?: string;
@@ -29,7 +30,7 @@ export async function getNotifications(filters?: {
     .sort({ createdAt: -1 })
     .limit(50);
 
-  return JSON.parse(JSON.stringify(notifications));
+  return serialize(notifications);
 }
 
 export async function getNotificationById(id: string) {
@@ -37,7 +38,7 @@ export async function getNotificationById(id: string) {
 
   const notification = await Notification.findById(id);
 
-  return JSON.parse(JSON.stringify(notification));
+  return serialize(notification);
 }
 
 export async function createNotification(data: any) {
@@ -46,7 +47,7 @@ export async function createNotification(data: any) {
   const notification = await Notification.create(data);
 
   revalidatePath('/dashboard/notifications');
-  return JSON.parse(JSON.stringify(notification));
+  return serialize(notification);
 }
 
 export async function markAsRead(id: string) {
@@ -59,7 +60,7 @@ export async function markAsRead(id: string) {
   );
 
   revalidatePath('/dashboard/notifications');
-  return JSON.parse(JSON.stringify(notification));
+  return serialize(notification);
 }
 
 export async function markAllAsRead(userId?: string) {

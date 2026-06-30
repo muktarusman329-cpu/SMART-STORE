@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Sale } from '@/models';
+import { apiError } from '@/lib/api-utils';
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, subDays, subMonths, subWeeks, subYears } from 'date-fns';
 
 export async function GET(request: Request) {
@@ -71,7 +72,6 @@ export async function GET(request: Request) {
     const lastCount = lastSales.length;
     const salesChange = lastCount > 0 ? ((currentCount - lastCount) / lastCount) * 100 : 0;
 
-    // Grouping for chart
     const groupedData = currentSales.reduce((acc: Record<string, { name: string; revenue: number; sales: number; profit: number }>, sale) => {
       const date = new Date(sale.createdAt);
       let key: string;
@@ -82,7 +82,6 @@ export async function GET(request: Request) {
       if (!acc[key]) acc[key] = { name: key, revenue: 0, sales: 0, profit: 0 };
       acc[key].revenue += sale.total;
       acc[key].sales += 1;
-      // Approximate profit as 30% for now
       acc[key].profit += sale.total * 0.3;
       return acc;
     }, {});
@@ -99,13 +98,13 @@ export async function GET(request: Request) {
           avgTransaction: currentCount > 0 ? currentRevenue / currentCount : 0,
           revenueChange,
           salesChange,
-          profitChange: revenueChange, // simplified
+          profitChange: revenueChange,
           avgChange: 0
         },
         chartData
       }
     });
   } catch (error) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return apiError(error);
   }
 }

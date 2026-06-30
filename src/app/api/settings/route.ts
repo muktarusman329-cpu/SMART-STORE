@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import connectDB from '@/lib/mongodb';
 import Branch from '@/models/Branch';
+import { withApiHandler, apiSuccess } from '@/lib/api-utils';
 
-export async function GET(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const branchId = session.user.branchId;
+export const GET = withApiHandler(
+  async (_request: NextRequest, { session }) => {
+    const branchId = session!.user!.branchId;
     if (!branchId) {
       return NextResponse.json({ success: false, error: 'No branch associated with user' }, { status: 400 });
     }
@@ -21,20 +16,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Branch not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: branch.settings });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return apiSuccess(branch.settings);
   }
-}
+);
 
-export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session || !session.user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const branchId = session.user.branchId;
+export const POST = withApiHandler(
+  async (request: NextRequest, { session }) => {
+    const branchId = session!.user!.branchId;
     if (!branchId) {
       return NextResponse.json({ success: false, error: 'No branch associated with user' }, { status: 400 });
     }
@@ -47,13 +35,12 @@ export async function POST(request: NextRequest) {
     }
 
     await connectDB();
-    
+
     const branch = await Branch.findById(branchId);
     if (!branch) {
       return NextResponse.json({ success: false, error: 'Branch not found' }, { status: 404 });
     }
 
-    // Merge and save settings
     branch.settings = {
       ...branch.settings,
       ...settings,
@@ -61,8 +48,6 @@ export async function POST(request: NextRequest) {
 
     await branch.save();
 
-    return NextResponse.json({ success: true, data: branch.settings });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return apiSuccess(branch.settings);
   }
-}
+);

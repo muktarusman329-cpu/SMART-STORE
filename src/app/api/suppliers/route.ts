@@ -1,66 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createSupplier, getSuppliers } from '@/lib/actions/suppliers';
-import { rateLimit, getClientIdentifier } from '@/lib/rate-limit';
-import { handleApiError } from '@/lib/error-handler';
+import { withApiHandler, apiSuccess } from '@/lib/api-utils';
 
-export async function GET(request: NextRequest) {
-  try {
-    // Rate limiting: 30 requests per minute per user/IP
-    const identifier = getClientIdentifier(request);
-    const rateLimitResult = rateLimit(identifier, 30, 60 * 1000);
-    
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Too many requests. Please try again later.',
-          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-        },
-        { status: 429 }
-      );
-    }
-
+export const GET = withApiHandler(
+  async (request: NextRequest) => {
     const searchParams = request.nextUrl.searchParams;
     const filters = {
       search: searchParams.get('search') || undefined,
     };
 
     const suppliers = await getSuppliers(filters);
-    return NextResponse.json({ success: true, data: suppliers });
-  } catch (error) {
-    const errorResponse = handleApiError(error);
-    return NextResponse.json(
-      { success: false, error: errorResponse.error },
-      { status: errorResponse.statusCode }
-    );
-  }
-}
+    return apiSuccess(suppliers);
+  },
+  { rateLimit: { limit: 30 }, requireAuth: false }
+);
 
-export async function POST(request: NextRequest) {
-  try {
-    // Rate limiting: 10 requests per minute per user/IP
-    const identifier = getClientIdentifier(request);
-    const rateLimitResult = rateLimit(identifier, 10, 60 * 1000);
-    
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Too many requests. Please try again later.',
-          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000)
-        },
-        { status: 429 }
-      );
-    }
-
+export const POST = withApiHandler(
+  async (request: NextRequest) => {
     const data = await request.json();
     const supplier = await createSupplier(data);
-    return NextResponse.json({ success: true, data: supplier });
-  } catch (error) {
-    const errorResponse = handleApiError(error);
-    return NextResponse.json(
-      { success: false, error: errorResponse.error },
-      { status: errorResponse.statusCode }
-    );
-  }
-}
+    return apiSuccess(supplier);
+  },
+  { rateLimit: { limit: 10 }, requireAuth: false }
+);

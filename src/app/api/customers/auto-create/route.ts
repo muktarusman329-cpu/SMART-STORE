@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Customer, Loyalty } from '@/models';
 import { generateCustomerId } from '@/lib/utils';
+import { apiError } from '@/lib/api-utils';
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +18,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if customer already exists
     const existingCustomer = await Customer.findOne({ phone });
     if (existingCustomer) {
       return NextResponse.json({
@@ -27,10 +27,8 @@ export async function POST(request: Request) {
       }, { status: 409 });
     }
 
-    // Generate customer ID
     const customerId = generateCustomerId();
 
-    // Create new customer
     const customer = await Customer.create({
       customerId,
       phone,
@@ -44,7 +42,6 @@ export async function POST(request: Request) {
       favoriteCategories: [],
     });
 
-    // Create loyalty record
     await Loyalty.create({
       customerId: customer._id,
       pointsBalance: 0,
@@ -72,10 +69,6 @@ export async function POST(request: Request) {
     }, { status: 201 });
 
   } catch (error) {
-    console.error('Error creating customer:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to create customer' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }

@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Employee, User } from '@/models';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getEmployees(filters?: {
   search?: string;
@@ -28,7 +29,7 @@ export async function getEmployees(filters?: {
     .populate('branchId', 'name')
     .sort({ createdAt: -1 });
 
-  return JSON.parse(JSON.stringify(employees));
+  return serialize(employees);
 }
 
 export async function getEmployeeById(id: string) {
@@ -38,7 +39,7 @@ export async function getEmployeeById(id: string) {
     .populate('userId', 'name email phone avatar')
     .populate('branchId', 'name');
 
-  return JSON.parse(JSON.stringify(employee));
+  return serialize(employee);
 }
 
 export async function createEmployee(data: any) {
@@ -65,7 +66,7 @@ export async function createEmployee(data: any) {
   });
 
   revalidatePath('/dashboard/employees');
-  return JSON.parse(JSON.stringify({ employee, user }));
+  return serialize({ employee, user });
 }
 
 export async function updateEmployee(id: string, data: any) {
@@ -78,7 +79,7 @@ export async function updateEmployee(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/employees');
-  return JSON.parse(JSON.stringify(employee));
+  return serialize(employee);
 }
 
 export async function deleteEmployee(id: string) {
@@ -104,7 +105,7 @@ export async function updateEmployeePerformance(id: string, performance: any) {
   );
 
   revalidatePath('/dashboard/employees');
-  return JSON.parse(JSON.stringify(employee));
+  return serialize(employee);
 }
 
 export async function updateEmployeeAttendance(id: string, attendance: any) {
@@ -117,5 +118,5 @@ export async function updateEmployeeAttendance(id: string, attendance: any) {
   );
 
   revalidatePath('/dashboard/employees');
-  return JSON.parse(JSON.stringify(employee));
+  return serialize(employee);
 }

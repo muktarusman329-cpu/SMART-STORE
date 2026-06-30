@@ -21,10 +21,14 @@ export function formatDate(date: Date | string): string {
   }).format(new Date(date));
 }
 
-export function generateSKU(): string {
+function generateId(prefix: string, randomLength: number = 6): string {
   const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-  return `SKU-${timestamp}-${random}`;
+  const random = Math.random().toString(36).substring(2, 2 + randomLength).toUpperCase();
+  return `${prefix}-${timestamp}-${random}`;
+}
+
+export function generateSKU(): string {
+  return generateId('SKU', 4);
 }
 
 export function generateBarcode(): string {
@@ -34,13 +38,9 @@ export function generateBarcode(): string {
 }
 
 export function generateCustomerId(): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `CUST-${timestamp}-${random}`;
+  return generateId('CUST');
 }
 
 export function generateTransactionId(): string {
-  const timestamp = Date.now().toString(36).toUpperCase();
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
-  return `TXN-${timestamp}-${random}`;
+  return generateId('TXN');
 }

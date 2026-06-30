@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Sale, Product, Expense, Customer, Notification } from '@/models';
 import { startOfDay, endOfDay, startOfMonth, endOfMonth, subDays } from 'date-fns';
+import { serialize } from '@/lib/serialize';
 
 export async function getDashboardStats() {
   const db = await connectDB();
@@ -111,7 +112,7 @@ export async function getDashboardStats() {
     totalExpenses,
     totalProfit,
     totalCustomers,
-    recentTransactions: JSON.parse(JSON.stringify(recentTransactions)),
+    recentTransactions: serialize(recentTransactions),
     unreadNotifications,
   };
 }

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createNotification, getNotifications } from '@/lib/actions/notifications';
+import { apiSuccess, apiError } from '@/lib/api-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,12 +12,9 @@ export async function GET(request: NextRequest) {
     };
 
     const notifications = await getNotifications(filters);
-    return NextResponse.json({ success: true, data: notifications });
+    return apiSuccess(notifications);
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }
 
@@ -24,11 +22,8 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json();
     const notification = await createNotification(data);
-    return NextResponse.json({ success: true, data: notification });
+    return apiSuccess(notification);
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }

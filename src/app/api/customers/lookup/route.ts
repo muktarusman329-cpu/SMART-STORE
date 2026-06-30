@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import { Customer } from '@/models';
+import { apiError } from '@/lib/api-utils';
 
 export async function GET(request: Request) {
   try {
@@ -51,10 +52,6 @@ export async function GET(request: Request) {
     }, { status: 404 });
 
   } catch (error) {
-    console.error('Error looking up customer:', error);
-    return NextResponse.json(
-      { success: false, message: 'Failed to lookup customer' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProductByBarcode } from '@/lib/actions/pos';
+import { apiSuccess, apiError } from '@/lib/api-utils';
 
 export async function GET(
   request: NextRequest,
@@ -16,11 +17,8 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, data: product });
+    return apiSuccess(product);
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }

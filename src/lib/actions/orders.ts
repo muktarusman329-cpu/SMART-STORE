@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import Order from '@/models/Order';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getOrders(source?: 'online' | 'whatsapp', filters?: { search?: string }) {
   await connectDB();
@@ -18,7 +19,7 @@ export async function getOrders(source?: 'online' | 'whatsapp', filters?: { sear
     ];
   }
   const orders = await Order.find(query).sort({ createdAt: -1 });
-  return JSON.parse(JSON.stringify(orders));
+  return serialize(orders);
 }
 
 export async function updateOrderStatus(id: string, status: string) {
@@ -26,7 +27,7 @@ export async function updateOrderStatus(id: string, status: string) {
   const order = await Order.findByIdAndUpdate(id, { orderStatus: status }, { new: true });
   revalidatePath('/dashboard/online-orders');
   revalidatePath('/dashboard/whatsapp-orders');
-  return JSON.parse(JSON.stringify(order));
+  return serialize(order);
 }
 
 export async function updatePaymentStatus(id: string, status: string) {
@@ -34,5 +35,5 @@ export async function updatePaymentStatus(id: string, status: string) {
   const order = await Order.findByIdAndUpdate(id, { paymentStatus: status }, { new: true });
   revalidatePath('/dashboard/online-orders');
   revalidatePath('/dashboard/whatsapp-orders');
-  return JSON.parse(JSON.stringify(order));
+  return serialize(order);
 }
