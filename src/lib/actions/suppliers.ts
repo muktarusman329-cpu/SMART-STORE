@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Supplier } from '@/models';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getSuppliers(filters?: {
   search?: string;
@@ -22,7 +23,7 @@ export async function getSuppliers(filters?: {
 
   const suppliers = await Supplier.find(query).sort({ createdAt: -1 });
 
-  return JSON.parse(JSON.stringify(suppliers));
+  return serialize(suppliers);
 }
 
 export async function getSupplierById(id: string) {
@@ -30,7 +31,7 @@ export async function getSupplierById(id: string) {
 
   const supplier = await Supplier.findById(id).populate('productsSupplied');
 
-  return JSON.parse(JSON.stringify(supplier));
+  return serialize(supplier);
 }
 
 export async function createSupplier(data: any) {
@@ -39,7 +40,7 @@ export async function createSupplier(data: any) {
   const supplier = await Supplier.create(data);
 
   revalidatePath('/dashboard/suppliers');
-  return JSON.parse(JSON.stringify(supplier));
+  return serialize(supplier);
 }
 
 export async function updateSupplier(id: string, data: any) {
@@ -52,7 +53,7 @@ export async function updateSupplier(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/suppliers');
-  return JSON.parse(JSON.stringify(supplier));
+  return serialize(supplier);
 }
 
 export async function deleteSupplier(id: string) {
@@ -85,5 +86,5 @@ export async function updateSupplierDebt(id: string, amount: number, operation: 
   await supplier.save();
 
   revalidatePath('/dashboard/suppliers');
-  return JSON.parse(JSON.stringify(supplier));
+  return serialize(supplier);
 }

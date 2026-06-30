@@ -6,6 +6,8 @@ import { generateCustomerId, generateTransactionId } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
 import { sendWhatsAppMessage } from '@/lib/whatsapp';
 import { generateThankYouMessage } from '@/lib/whatsapp-utils';
+import { serialize } from '@/lib/serialize';
+import { createLowStockAlert, isLowStock } from '@/lib/stock-alerts';
 
 export async function searchProducts(query: string) {
   await connectDB();
@@ -21,7 +23,7 @@ export async function searchProducts(query: string) {
     .populate('categoryId', 'name')
     .limit(20);
 
-  return JSON.parse(JSON.stringify(products));
+  return serialize(products);
 }
 
 export async function getProductByBarcode(barcode: string) {
@@ -37,7 +39,7 @@ export async function getProductByBarcode(barcode: string) {
     return null;
   }
 
-  return JSON.parse(JSON.stringify(product));
+  return serialize(product);
 }
 
 export async function createSale(data: {
@@ -92,16 +94,8 @@ export async function createSale(data: {
     product.stockQuantity -= item.quantity;
     await product.save();
 
-    // Check if stock is low and create notification
-    if (product.stockQuantity <= product.minStockLevel) {
-      const { Notification } = await import('@/models');
-      await Notification.create({
-        title: 'Low Stock Alert',
-        message: `${product.name} is running low on stock (${product.stockQuantity} remaining)`,
-        type: 'warning',
-        category: 'stock',
-        priority: 'high',
-      });
+    if (isLowStock(product.stockQuantity, product.minStockLevel)) {
+      await createLowStockAlert(product.name, product.stockQuantity);
       revalidatePath('/dashboard/notifications');
     }
   }
@@ -279,7 +273,7 @@ export async function createSale(data: {
   revalidatePath('/dashboard/pos');
   revalidatePath('/dashboard');
 
-  return JSON.parse(JSON.stringify(sale));
+  return serialize(sale);
 }
 
 export async function getSaleById(id: string) {
@@ -290,7 +284,7 @@ export async function getSaleById(id: string) {
     .populate('cashierId', 'name')
     .populate('branchId', 'name');
 
-  return JSON.parse(JSON.stringify(sale));
+  return serialize(sale);
 }
 
 export async function getRecentSales(limit: number = 10) {
@@ -302,5 +296,5 @@ export async function getRecentSales(limit: number = 10) {
     .populate('customerId', 'name')
     .populate('cashierId', 'name');
 
-  return JSON.parse(JSON.stringify(sales));
+  return serialize(sales);
 }

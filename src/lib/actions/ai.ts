@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Sale, Product, Expense, Customer, AIReport } from '@/models';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { serialize } from '@/lib/serialize';
 
 // Initialize Google Gemini AI
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
@@ -165,7 +166,7 @@ export async function getAIReports(userId?: string) {
     .sort({ createdAt: -1 })
     .limit(20);
 
-  return JSON.parse(JSON.stringify(reports));
+  return serialize(reports);
 }
 
 export async function predictSales(productId: string, days: number = 30) {

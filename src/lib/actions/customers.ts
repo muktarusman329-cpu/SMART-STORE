@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Customer, Loyalty } from '@/models';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getCustomers(filters?: {
   search?: string;
@@ -21,7 +22,7 @@ export async function getCustomers(filters?: {
 
   const customers = await Customer.find(query).sort({ createdAt: -1 });
 
-  return JSON.parse(JSON.stringify(customers));
+  return serialize(customers);
 }
 
 export async function getCustomerById(id: string) {
@@ -29,7 +30,7 @@ export async function getCustomerById(id: string) {
 
   const customer = await Customer.findById(id);
 
-  return JSON.parse(JSON.stringify(customer));
+  return serialize(customer);
 }
 
 export async function createCustomer(data: any) {
@@ -38,7 +39,7 @@ export async function createCustomer(data: any) {
   const customer = await Customer.create(data);
 
   revalidatePath('/dashboard/customers');
-  return JSON.parse(JSON.stringify(customer));
+  return serialize(customer);
 }
 
 export async function updateCustomer(id: string, data: any) {
@@ -51,7 +52,7 @@ export async function updateCustomer(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/customers');
-  return JSON.parse(JSON.stringify(customer));
+  return serialize(customer);
 }
 
 export async function deleteCustomer(id: string) {
@@ -70,7 +71,7 @@ export async function getTopCustomers(limit: number = 10) {
     .sort({ totalSpent: -1 })
     .limit(limit);
 
-  return JSON.parse(JSON.stringify(customers));
+  return serialize(customers);
 }
 
 export async function getCustomerAnalytics() {
@@ -150,5 +151,5 @@ export async function getCustomerPurchaseHistory(customerId: string) {
     .populate('cashierId', 'name')
     .populate('branchId', 'name');
 
-  return JSON.parse(JSON.stringify(sales));
+  return serialize(sales);
 }

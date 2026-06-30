@@ -4,6 +4,8 @@ import connectDB from '@/lib/mongodb';
 import { Product, Category } from '@/models';
 import { generateSKU, generateBarcode } from '@/lib/utils';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
+import { createLowStockAlert, isLowStock } from '@/lib/stock-alerts';
 
 export async function getProducts(filters?: {
   category?: string;
@@ -45,7 +47,7 @@ export async function getProducts(filters?: {
     .populate('supplierId', 'name')
     .sort({ createdAt: -1 });
 
-  return JSON.parse(JSON.stringify(products));
+  return serialize(products);
 }
 
 export async function getProductById(id: string) {
@@ -59,7 +61,7 @@ export async function getProductById(id: string) {
     .populate('categoryId', 'name')
     .populate('supplierId', 'name');
 
-  return JSON.parse(JSON.stringify(product));
+  return serialize(product);
 }
 
 export async function createProduct(data: any) {
@@ -79,7 +81,7 @@ export async function createProduct(data: any) {
   });
 
   revalidatePath('/dashboard/inventory');
-  return JSON.parse(JSON.stringify(product));
+  return serialize(product);
 }
 
 export async function updateProduct(id: string, data: any) {
@@ -96,7 +98,7 @@ export async function updateProduct(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/inventory');
-  return JSON.parse(JSON.stringify(product));
+  return serialize(product);
 }
 
 export async function deleteProduct(id: string) {
@@ -136,20 +138,12 @@ export async function updateStock(id: string, quantity: number, operation: 'add'
 
   await product.save();
 
-  // Check if stock is low and create notification
-  if (product.stockQuantity <= product.minStockLevel) {
-    const { Notification } = await import('@/models');
-    await Notification.create({
-      title: 'Low Stock Alert',
-      message: `${product.name} is running low on stock (${product.stockQuantity} remaining)`,
-      type: 'warning',
-      category: 'stock',
-      priority: 'high',
-    });
+  if (isLowStock(product.stockQuantity, product.minStockLevel)) {
+    await createLowStockAlert(product.name, product.stockQuantity);
   }
 
   revalidatePath('/dashboard/inventory');
-  return JSON.parse(JSON.stringify(product));
+  return serialize(product);
 }
 
 export async function getCategories() {
@@ -161,7 +155,7 @@ export async function getCategories() {
 
   const categories = await Category.find({ isActive: true }).sort({ name: 1 });
 
-  return JSON.parse(JSON.stringify(categories));
+  return serialize(categories);
 }
 
 export async function createCategory(data: any) {
@@ -174,7 +168,7 @@ export async function createCategory(data: any) {
   const category = await Category.create(data);
 
   revalidatePath('/dashboard/inventory');
-  return JSON.parse(JSON.stringify(category));
+  return serialize(category);
 }
 
 export async function updateCategory(id: string, data: any) {
@@ -191,7 +185,7 @@ export async function updateCategory(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/inventory');
-  return JSON.parse(JSON.stringify(category));
+  return serialize(category);
 }
 
 export async function deleteCategory(id: string) {
@@ -221,7 +215,7 @@ export async function getLowStockProducts() {
     .populate('categoryId', 'name')
     .sort({ stockQuantity: 1 });
 
-  return JSON.parse(JSON.stringify(products));
+  return serialize(products);
 }
 
 export async function getExpiringProducts() {
@@ -240,5 +234,5 @@ export async function getExpiringProducts() {
     .populate('categoryId', 'name')
     .sort({ expiryDate: 1 });
 
-  return JSON.parse(JSON.stringify(products));
+  return serialize(products);
 }

@@ -3,6 +3,7 @@
 import connectDB from '@/lib/mongodb';
 import { Expense } from '@/models';
 import { revalidatePath } from 'next/cache';
+import { serialize } from '@/lib/serialize';
 
 export async function getExpenses(filters?: {
   category?: string;
@@ -39,7 +40,7 @@ export async function getExpenses(filters?: {
     .populate('createdBy', 'name')
     .sort({ date: -1 });
 
-  return JSON.parse(JSON.stringify(expenses));
+  return serialize(expenses);
 }
 
 export async function getExpenseById(id: string) {
@@ -47,7 +48,7 @@ export async function getExpenseById(id: string) {
 
   const expense = await Expense.findById(id).populate('createdBy', 'name');
 
-  return JSON.parse(JSON.stringify(expense));
+  return serialize(expense);
 }
 
 export async function createExpense(data: any) {
@@ -56,7 +57,7 @@ export async function createExpense(data: any) {
   const expense = await Expense.create(data);
 
   revalidatePath('/dashboard/expenses');
-  return JSON.parse(JSON.stringify(expense));
+  return serialize(expense);
 }
 
 export async function updateExpense(id: string, data: any) {
@@ -69,7 +70,7 @@ export async function updateExpense(id: string, data: any) {
   );
 
   revalidatePath('/dashboard/expenses');
-  return JSON.parse(JSON.stringify(expense));
+  return serialize(expense);
 }
 
 export async function deleteExpense(id: string) {

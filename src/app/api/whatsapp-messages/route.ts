@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWhatsAppMessages, getWhatsAppMessageStats } from '@/lib/whatsapp';
+import { apiError } from '@/lib/api-utils';
 
 export async function GET(request: NextRequest) {
   try {
@@ -22,9 +23,6 @@ export async function GET(request: NextRequest) {
       stats,
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return apiError(error);
   }
 }
